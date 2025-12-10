@@ -15,6 +15,10 @@ from sympy.parsing.sympy_parser import (
 )
 
 
+class IteracoesExcedidas(Exception):
+    pass
+
+
 def ler_valor_matematico(entrada):
     # Configuração para entender 'pi', 'e', '^', multiplicação implícita
     transformations = standard_transformations + (
@@ -111,6 +115,9 @@ def main():
                 raise ValueError("Erro: Número inválido\n")
 
             rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
+
+        except IteracoesExcedidas:
+            print("O número de iterações excedeu o limite dado.")
         except SympifyError as e:
             print(f"Erro de sintaxe: {e}")
         except ValueError as e:
