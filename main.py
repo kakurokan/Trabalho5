@@ -45,12 +45,15 @@ def variables(n):
         "e": E,
         "pi": pi,
     }
+    local_xi = []
     x = "x"
     for i in range(1, n + 1):
         var = x + str(i)
-        locals_vars[var] = symbols(var, real=True)
+        simbolo = symbols(var, real=True)
+        locals_vars[var] = simbolo
+        local_xi.append(simbolo)
 
-    return locals_vars
+    return locals_vars, local_xi
 
 
 def ler_funcao(fi, vars):
@@ -79,7 +82,7 @@ def main():
             if n <= 0:
                 raise ValueError("Número inválido")
 
-            local_vars = variables(n)
+            local_vars, local_xi = variables(n)
 
             print(f"Insira a {n} funções (f(x) = 0)")
             funcoes = []
@@ -88,6 +91,8 @@ def main():
                 fi = ler_funcao(fi_str, local_vars)
                 funcoes.append(fi)
             matriz_fi = criar_matriz(funcoes)
+            X = Matrix(local_xi)
+            jacobiano = matriz_fi.jacobian(X)
 
             print(
                 f"Insira a aproximação inicial",
@@ -97,7 +102,7 @@ def main():
             for i in range(n):
                 xi_str = input(f"Insira a aproximação para x{i + 1}: ").strip()
                 xi = ler_valor_matematico(xi_str)
-                aproximacoes.append(float(xi))
+                aproximacoes.append(xi)
             matriz_xi = criar_matriz(aproximacoes)
 
             tol = float(input("\nInsira a tolerância absoluta: "))
