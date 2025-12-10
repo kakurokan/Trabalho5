@@ -1,4 +1,3 @@
-from setuptools.package_index import local_open
 from sympy import (
     Matrix,
     sympify,
@@ -60,13 +59,13 @@ def variables(n):
     return locals_vars, local_xi
 
 
-def ler_funcao(fi, vars):
+def ler_funcao(fi, function_vars):
     transformations = standard_transformations + (
         implicit_multiplication_application,
         convert_xor,
     )  # Permite que o parse aceite '^' = **, 'ax' = a * x, e^a = exp(a)
     fi = parse_expr(
-        fi, local_dict=vars, transformations=transformations
+        fi, local_dict=function_vars, transformations=transformations
     )  # Converte o input numa expressão sympy
     return fi
 
