@@ -1,52 +1,53 @@
-
-from sympy import (
-    Matrix,
-    sympify,
-    SympifyError,
-    symbols,
-    E,
-    pi,
-    lambdify
-)
+from numpy import array, linalg
+from sympy import Matrix, sympify, SympifyError, symbols, E, pi, lambdify
 from sympy.parsing.sympy_parser import (
     standard_transformations,
     implicit_multiplication_application,
     convert_xor,
     parse_expr,
 )
-import numpy as np
+
 
 class IteracoesExcedidas(Exception):
     pass
 
+
+def imprime_resultado(matriz, n):
+    print(f"⎧ x1 = {matriz[0]}")
+    for i in range(1, n - 1):
+        print(f"| x{i + 1} = {matriz[i]}")
+    print(f"⎩ x{n} = {matriz[n - 1]}")
+
+
 def newton(matriz_fi, jacobiano, x0, local_xi, tol, n_max):
     n = len(x0)
 
-    F_func = lambdify(local_xi, matriz_fi, 'numpy')
-    J_func = lambdify(local_xi, jacobiano, 'numpy')
+    F_func = lambdify(local_xi, matriz_fi, "numpy")
+    J_func = lambdify(local_xi, jacobiano, "numpy")
 
-    X = np.array([float(x0[i]) for i in range(n)], dtype=float)
+    X = array([float(x0[i]) for i in range(n)], dtype=float)
 
     for k in range(n_max):
         print(f"\nIteração {k + 1}: X = {X}")
 
-        F_val = np.array(F_func(*X), dtype=float).flatten()
-        J_val = np.array(J_func(*X), dtype=float)
+        F_val = array(F_func(*X), dtype=float).flatten()
+        J_val = array(J_func(*X), dtype=float)
 
         try:
-            delta = np.linalg.solve(J_val, -F_val)
-        except np.linalg.LinAlgError:
+            delta = linalg.solve(J_val, -F_val)
+        except linalg.LinAlgError:
             print("Erro: Jacobiano não é invertivel")
             break
 
         X += delta
 
-        norma_delta = np.max(np.abs(delta))
+        norma_delta = max(abs(delta))
 
         if norma_delta < tol:
-            print(f"Convergiu em {k + 1} iterações")
             return Matrix(X), k + 1
+
     raise IteracoesExcedidas(f"Não convergiu em {n_max} iterações")
+
 
 def ler_valor_matematico(entrada):
     # Configuração para entender 'pi', 'e', '^', multiplicação implícita
@@ -66,11 +67,6 @@ def ler_valor_matematico(entrada):
 def criar_matriz(elementos):
     matrix = [sympify(n) for n in elementos]
     return Matrix(matrix)
-
-
-def norma(matriz_a, matriz_b):
-    resultado = matriz_b - matriz_a
-    return abs(max(resultado, key=abs))
 
 
 def variables(n):
@@ -136,19 +132,18 @@ def main():
                 xi_str = input(f"Insira a aproximação para x{i + 1}: ").strip()
                 xi = ler_valor_matematico(xi_str)
                 aproximacoes.append(xi)
-            matriz_xi = criar_matriz(aproximacoes)
 
             tol = float(input("\nInsira a tolerância absoluta: "))
             n_max = int(input("Insira o número máximo de iterações: "))
             if n_max <= 0:
                 raise ValueError("Erro: Número inválido\n")
+
             solucao, iteracoes = newton(
-                matriz_fi, jacobiano, matriz_xi, local_xi, tol, n_max
+                matriz_fi, jacobiano, aproximacoes, local_xi, tol, n_max
             )
 
             print(f"\nSolução encontrada em {iteracoes} iterações:")
-            for i in range(n):
-                print(f"x{i + 1} = {float(solucao[i]):.10f}")
+            imprime_resultado(solucao, n)
 
             rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
 
