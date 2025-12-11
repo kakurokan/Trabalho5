@@ -13,6 +13,10 @@ class IteracoesExcedidas(Exception):
 
 
 def imprime_resultado(matriz, n):
+    if n == 1:
+        print(f"[ x1 = {matriz[0]}")
+        return
+
     print(f"⎧ x1 = {matriz[0]}")
     for i in range(1, n - 1):
         print(f"| x{i + 1} = {matriz[i]}")
