@@ -1,3 +1,4 @@
+
 from sympy import (
     Matrix,
     sympify,
@@ -5,6 +6,7 @@ from sympy import (
     symbols,
     E,
     pi,
+    lambdify
 )
 from sympy.parsing.sympy_parser import (
     standard_transformations,
@@ -12,11 +14,39 @@ from sympy.parsing.sympy_parser import (
     convert_xor,
     parse_expr,
 )
-
+import numpy as np
 
 class IteracoesExcedidas(Exception):
     pass
 
+def newton(matriz_fi, jacobiano, x0, local_xi, tol, n_max):
+    n = len(x0)
+
+    F_func = lambdify(local_xi, matriz_fi, 'numpy')
+    J_func = lambdify(local_xi, jacobiano, 'numpy')
+
+    X = np.array([float(x0[i]) for i in range(n)], dtype=float)
+
+    for k in range(n_max):
+        print(f"\nIteração {k + 1}: X = {X}")
+
+        F_val = np.array(F_func(*X), dtype=float).flatten()
+        J_val = np.array(J_func(*X), dtype=float)
+
+        try:
+            delta = np.linalg.solve(J_val, -F_val)
+        except np.linalg.LinAlgError:
+            print("Erro: Jacobiano não é invertivel")
+            break
+
+        X += delta
+
+        norma_delta = np.max(np.abs(delta))
+
+        if norma_delta < tol:
+            print(f"Convergiu em {k + 1} iterações")
+            return Matrix(X), k + 1
+    raise IteracoesExcedidas(f"Não convergiu em {n_max} iterações")
 
 def ler_valor_matematico(entrada):
     # Configuração para entender 'pi', 'e', '^', multiplicação implícita
@@ -112,6 +142,13 @@ def main():
             n_max = int(input("Insira o número máximo de iterações: "))
             if n_max <= 0:
                 raise ValueError("Erro: Número inválido\n")
+            solucao, iteracoes = newton(
+                matriz_fi, jacobiano, matriz_xi, local_xi, tol, n_max
+            )
+
+            print(f"\nSolução encontrada em {iteracoes} iterações:")
+            for i in range(n):
+                print(f"x{i + 1} = {float(solucao[i]):.10f}")
 
             rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
 
