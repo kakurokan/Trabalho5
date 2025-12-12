@@ -14,7 +14,7 @@ class IteracoesExcedidas(Exception):
 
 def imprime_resultado(matriz, n):
     if n == 1:
-        print(f"[ x1 = {matriz[0]}")
+        print(f"[ x1 = {matriz[0]}]")
         return
 
     print(f"⎧ x1 = {matriz[0]}")
