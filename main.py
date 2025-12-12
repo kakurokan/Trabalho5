@@ -24,6 +24,7 @@ def imprime_resultado(matriz, n):
 
 
 def newton(matriz_fi, jacobiano, x0, local_xi, tol, n_max):
+    print("\n")
     n = len(x0)
 
     F_func = lambdify(local_xi, matriz_fi, "numpy")
@@ -32,7 +33,7 @@ def newton(matriz_fi, jacobiano, x0, local_xi, tol, n_max):
     X = array([float(x0[i]) for i in range(n)], dtype=float)
 
     for k in range(n_max):
-        print(f"\nIteração {k + 1}: X = {X}")
+        print(f"Iteração {k + 1}: X = {X}")
 
         F_val = array(F_func(*X), dtype=float).flatten()
         J_val = array(J_func(*X), dtype=float)
@@ -101,11 +102,11 @@ def ler_funcao(fi, function_vars):
 
 
 def main():
-    print("*" * 65)
+    print("*" * 80)
     print(
-        "   Bem-vindo ao Solucionador de sistemas não lineares lineares utilizando o método de Newton"
+        "   Bem-vindo ao Solucionador de sistemas não lineares utilizando o método de Newton"
     )
-    print("*" * 65)
+    print("*" * 80)
 
     rodando = True
 
